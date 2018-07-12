@@ -39,7 +39,7 @@ Powered by Github Gists.
      * Publish Form (Power User Mode) to create package.json and schema information on Feed.
      * Github API integration for Gist publish
      * Feed Subscription
- * Server Plugin
+ * Server Plugin https://github.com/BaapWP/Micros-Server
      * Feed publishing
  * Schema & Sample Micros
      * Schema: https://gist.github.com/actual-saurabh/12a486173f4dee5cd52e63d85f38220f
