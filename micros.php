@@ -1,3 +1,4 @@
+<?php
 /*
 Plugin Name:  Micros
 Version:      0.0.1
@@ -8,3 +9,6 @@ License URI:  https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain:  micros
 Domain Path:  /languages
 */
+
+//directory constant
+define( 'Micros_PLUGIN_DIR', plugin_dir_path( __FILE ) );
