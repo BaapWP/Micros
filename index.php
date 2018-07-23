@@ -1,1 +1,1 @@
-// slience is gloden
+// silence is gloden
