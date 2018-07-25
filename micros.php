@@ -40,3 +40,37 @@ if(!function_exists('micro_page_render_callback')){
         <?php
     }
 }
+
+// register Micro sub page - Editor
+add_action('admin_menu', 'register_micros_submenu_page');
+
+function register_micros_submenu_page() {
+    add_submenu_page(
+        'micros',
+        'Editor',
+        'Editor',
+        'manage_options',
+        'editor',
+        'micros_submenu_page_callback' );
+}
+
+if(!function_exists('micros_submenu_page_callback')){
+    function micros_submenu_page_callback() {
+        global $title;
+        $settings = array(
+            'codeEditor' => wp_enqueue_code_editor( array('type' => 'text/html') ),
+        );
+        wp_enqueue_script( 'wp-theme-plugin-editor' );
+        wp_add_inline_script( 'wp-theme-plugin-editor', sprintf( 'jQuery( function( $ ) { wp.themePluginEditor.init( $( "#sub-template" ), %s ); } )', wp_json_encode( $settings ) ) );
+        wp_add_inline_script( 'wp-theme-plugin-editor', 'wp.themePluginEditor.themeOrPlugin = "plugin";' );
+        ?>
+        <div class="wrap">
+            <div id="icon-tools" class="icon32"></div>
+            <h2><?php echo $title; ?></h2>
+            <form action="#" id="sub-template">
+                <textarea cols="70" rows="30" name="newcontent" id="newcontent"></textarea>
+            </form>
+        </div>
+        <?php
+    }
+}
