@@ -17,10 +17,10 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		public function hook() {
 
 			//register Micro page hook to admin menu
-			add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+			add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
 
 			// register Micro sub page - Editor
-			add_action( 'admin_menu', array( $this, 'admin_submenu' ) );
+			add_action( 'admin_menu', array( &$this, 'admin_submenu' ) );
 		}
 
 		/**
@@ -28,7 +28,7 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		 */
 		public function admin_menu() {
 			add_menu_page(
-				__( 'Micros', 'micros' ), __( 'Micros', 'micros' ), 'manage_options', 'micros', 'micro_page_render_callback', 'dashicons-editor-expand', 70
+				__( 'Micros', 'micros' ), __( 'Micros', 'micros' ), 'manage_options', 'micros', array(&$this, 'admin_menu_callback'), 'dashicons-editor-expand', 70
 			);
 		}
 
@@ -51,7 +51,12 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		 */
 		public function admin_submenu() {
 			add_submenu_page(
-				'micros', 'Editor', 'Editor', 'manage_options', 'editor', 'micros_submenu_page_callback' );
+				'micros',
+                __( 'Editor', 'micros' ),
+                __( 'Editor', 'micros' ),
+                'manage_options',
+                'editor',
+                array(&$this, 'admin_submenu_callback' ));
 		}
 
 		/**
