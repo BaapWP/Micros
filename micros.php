@@ -15,7 +15,7 @@
  *
  * @var string The
  */
-define( 'MICROS_PLUGIN_DIR', plugin_dir_path( __FILE ) );
+define( 'MICROS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
 if ( ! defined( 'MICROS_UPLOAD_DIR' ) ) {
 	/**
