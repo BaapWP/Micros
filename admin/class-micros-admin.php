@@ -1,30 +1,30 @@
 <?php
-/**
- *
- */
+
+//exit if 'ABSPATH' constant not defined
 defined( 'ABSPATH' ) || exit();
 
+// create 'Micros_Admin' class when not defined
 if ( ! class_exists( 'Micros_Admin' ) ) {
 
 	/**
-	 *
+	 * This is the main class used to register and render admin pages.
 	 */
 	class Micros_Admin {
 
 		/**
-		 *
+		 * fires action hooks to register pages.
 		 */
 		public function hook() {
 
-			//register Micro page hook to admin menu
+			// hook to 'admin_menu' to register admin page
 			add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
 
-			// register Micro sub page - Editor
+            // hook to 'admin_menu' to register admin submenu page - 'Editor'
 			add_action( 'admin_menu', array( &$this, 'admin_submenu' ) );
 		}
 
 		/**
-		 *
+		 * Register admin page
 		 */
 		public function admin_menu() {
 			add_menu_page(
@@ -32,12 +32,11 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 			);
 		}
 
-// add_menu_page callback
 		/**
-		 *
-		 * @global type $title
+		 * Render HTML of admin page
 		 */
 		public function admin_menu_callback() {
+		    // admin page title
 			global $title;
 			?>
 			<div class="wrap">
@@ -46,9 +45,9 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 			<?php
 		}
 
-		/**
-		 *
-		 */
+        /**
+         * Register admin submenu page - 'Editor'
+         */
 		public function admin_submenu() {
 			add_submenu_page(
 				'micros',
@@ -60,16 +59,24 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		}
 
 		/**
-		 *
-		 * @global type $title
+		 * Render HTML of admin submenu page - 'Editor'
 		 */
 		public function admin_submenu_callback() {
+		    //admin submenu page title
 			global $title;
+
+			// Add codeEditor settings
 			$settings = array(
 				'codeEditor' => wp_enqueue_code_editor( array( 'type' => 'text/html' ) ),
 			);
+
+			// enqueue code editor script
 			wp_enqueue_script( 'wp-theme-plugin-editor' );
+
+			// add inline script to initialize to code mirror
 			wp_add_inline_script( 'wp-theme-plugin-editor', sprintf( 'jQuery( function( $ ) { wp.themePluginEditor.init( $( "#sub-template" ), %s ); } )', wp_json_encode( $settings ) ) );
+
+			// add inline script to set plugin name in  'wp.themePluginEditor.themeOrPlugin'
 			wp_add_inline_script( 'wp-theme-plugin-editor', 'wp.themePluginEditor.themeOrPlugin = "micros";' );
 			?>
 			<div class="wrap">
