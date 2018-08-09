@@ -97,7 +97,7 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 				<div id="icon-tools" class="icon32"></div>
 				<h2><?php echo $title; ?></h2>
 				<form action="#" id="sub-template">
-					<textarea cols="70" rows="30" name="newcontent" id="newcontent"></textarea>
+					<textarea cols="70" rows="30" name="newcontent" id="newcontent"><h1>WP Dev Classes</h1></textarea>
 				</form>
 			</div>
 			<?php
