@@ -1,4 +1,11 @@
 <?php
+/**
+ * The admin-specific functionality of the plugin.
+ *
+ * @package micros
+ * @subpackage micros/admin
+ * @since 0.0.1
+ */
 
 //exit if 'ABSPATH' constant not defined
 defined( 'ABSPATH' ) || exit();
