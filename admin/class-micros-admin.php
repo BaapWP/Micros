@@ -93,13 +93,24 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 			// Adds inline script to set plugin name in  'wp.themePluginEditor.themeOrPlugin'
 			wp_add_inline_script( 'wp-theme-plugin-editor', 'wp.themePluginEditor.themeOrPlugin = "micros";' );
 			?>
-			<div class="wrap">
-				<div id="icon-tools" class="icon32"></div>
-				<h2><?php echo $title; ?></h2>
-				<form action="#" id="sub-template">
-					<textarea cols="70" rows="30" name="newcontent" id="newcontent"><h1>WP Dev Classes</h1></textarea>
-				</form>
-			</div>
+            <div class="wrap">
+                <div id="templateside">
+                    <h2 id="micro-files-label"><?php _e( 'Micro Files' ); ?></h2>
+                </div>
+                <form action="#" id="sub-template">
+                    <div>
+                        <label for="newcontent" id="theme-plugin-editor-label"><?php _e( 'Selected file content:' ); ?></label>
+                        <textarea cols="70" rows="30" name="newcontent" id="newcontent"><h1>WP Dev Classes</h1></textarea>
+                        <input type="hidden" name="file" value="<?php //echo esc_attr( $file ); ?>" />
+                        <input type="hidden" name="micros" value="<?php //echo esc_attr( $micros ); ?>" />
+                    </div>
+                    <p class="submit">
+                        <?php submit_button( __( 'Update File' ), 'primary', 'submit', false ); ?>
+                        <span class="spinner"></span>
+                    </p>
+                </form>
+                <br class="clear" />
+            </div>
 			<?php
 		}
 
