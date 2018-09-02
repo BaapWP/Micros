@@ -19,7 +19,7 @@ function get_micro_files( ) {
 
 		$micro_files = array_values( array_unique( $list_files ) );
 	}
-
+    //error_log( print_r( $micro_files, true ), 3, WP_CONTENT_DIR.'/debug.log' );
 	return $micro_files;
 }
 
@@ -34,15 +34,18 @@ function get_micro_files( ) {
  */
 function wp_make_micro_file_tree( $micro_editable_files ) {
     $tree_list = array();
+    error_log( print_r( $micro_editable_files, true ), 3, WP_CONTENT_DIR.'/debug.log' );
     foreach ( $micro_editable_files as $micro_file ) {
         $list     = explode( '/', preg_replace( '#^.+?/#', '', $micro_file ) );
         $last_dir = &$tree_list;
+        //error_log( print_r( $list, true ), 3, WP_CONTENT_DIR.'/debug.log' );
         foreach ( $list as $dir ) {
             $last_dir =& $last_dir[ $dir ];
         }
-        $last_dir = $micro_file;
+            $last_dir = $micro_file;
     }
-    return $tree_list;
+        //error_log( print_r( $tree_list, true ), 3, WP_CONTENT_DIR.'/debug.log' );
+    return $tree_list['wp-content']['micro-micro'];
 }
 /**
  * Outputs the formatted file list for the micro editor.
@@ -76,8 +79,7 @@ function wp_print_micro_file_tree( $tree, $label = '', $level = 2, $size = 1, $i
                 <span class="folder-label"><?php echo esc_html($label); ?> <span
                         class="screen-reader-text"><?php _e('folder'); ?></span><span aria-hidden="true"
                                                                                       class="icon"></span></span>
-                <ul role="group"
-                    class="tree-folder"><?php wp_print_micro_file_tree($micro_file, '', $level + 1, $index, $size); ?></ul>
+                <ul role="group" class="tree-folder"><?php wp_print_micro_file_tree($micro_file, '', $level + 1, $index, $size); ?></ul>
             </li>
             <?php
         endforeach;
