@@ -61,7 +61,8 @@ function wp_make_micro_file_tree( $micro_editable_files ) {
  */
 function wp_print_micro_file_tree( $tree, $label = '', $level = 2, $size = 1, $index = 1 )
 {
-    global $file, $micro;
+    //global $file, $micro;
+    global $file;
     if (is_array($tree)) {
         $index = 0;
         $size = count($tree);
@@ -87,9 +88,9 @@ function wp_print_micro_file_tree( $tree, $label = '', $level = 2, $size = 1, $i
         $url = add_query_arg(
             array(
                 'file' => rawurlencode($tree),
-                'micro' => rawurlencode($micro),
+                //'micro' => rawurlencode($micro),
             ),
-            self_admin_url('micro-editor.php')
+            self_admin_url('admin.php?page=editor')
         );
         ?>
         <li role="none" class="<?php echo esc_attr($file === $tree ? 'current-file' : ''); ?>">
