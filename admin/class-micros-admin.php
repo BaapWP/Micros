@@ -89,9 +89,19 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             if ( isset( $_REQUEST['file'] ) ) {
                 $file = wp_unslash( $_REQUEST['file'] );
 
-                $file_content = esc_textarea( file_get_contents( $file ) );
+            }else{
+                $micro_dir = WP_CONTENT_DIR.'/micro-micro';
+                $get_first_file_or_dir = scandir( $micro_dir );
+                if( is_dir( $micro_dir."/{$get_first_file_or_dir[2]}" ) ){
+                    $get_file = scandir( $micro_dir."/{$get_first_file_or_dir[2]}" );
+                    $file = $micro_dir."/{$get_first_file_or_dir[2]}"."/{$get_file[2]}";
 
+                }else{
+                    $file = $micro_dir."/{$get_first_file_or_dir[2]}";
+                }
             }
+            //var_dump($file);
+            $file_content = esc_textarea( file_get_contents( $file ) );
 
 			// Adds codeEditor settings
 			$settings = array(
