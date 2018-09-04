@@ -84,6 +84,15 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 
 			global $title;
 
+            global $file;
+
+            if ( isset( $_REQUEST['file'] ) ) {
+                $file = wp_unslash( $_REQUEST['file'] );
+
+                $file_content = esc_textarea( file_get_contents( $file ) );
+
+            }
+
 			// Adds codeEditor settings
 			$settings = array(
 				'codeEditor' => wp_enqueue_code_editor( array( 'type' => 'text/html' ) ),
@@ -125,7 +134,7 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                 <form action="#" id="sub-template">
                     <div>
                         <label for="newcontent" id="theme-plugin-editor-label"><?php _e( 'Selected file content:' ); ?></label>
-                        <textarea cols="70" rows="30" name="newcontent" id="newcontent"><h1>WP Dev Classes</h1></textarea>
+                        <textarea cols="70" rows="30" name="newcontent" id="newcontent"><?php echo $file_content; ?></textarea>
                         <input type="hidden" name="file" value="<?php //echo esc_attr( $file ); ?>" />
                         <input type="hidden" name="micros" value="<?php //echo esc_attr( $micros ); ?>" />
                     </div>
