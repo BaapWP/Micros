@@ -141,7 +141,9 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                             </ul>
                     </ul>
                 </div>
+
                 <form action="#" id="sub-template">
+                    <?php wp_nonce_field( 'edit-plugin_' . $file, 'nonce' ); ?>
                     <div>
                         <label for="newcontent" id="theme-plugin-editor-label"><?php _e( 'Selected file content:' ); ?></label>
                         <textarea cols="70" rows="30" name="newcontent" id="newcontent"><?php echo $file_content; ?></textarea>
