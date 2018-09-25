@@ -88,6 +88,8 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             if ( !current_user_can('edit_plugins') )
                 wp_die( __('Sorry, you are not allowed to edit plugins for this site.') );
 
+            $title = __("Edit Micros");
+
 			global $title;
 
             global $file;
