@@ -33,7 +33,7 @@ if ( ! defined( 'MICROS_UPLOAD_DIR' ) ) {
      *
      * @var string
 	 */
-	define( 'MICROS_UPLOAD_DIR', WP_CONTENT_DIR . '/micros' );
+	define( 'MICROS_UPLOAD_DIR', WP_CONTENT_DIR . '/micro-micro' );
 }
 
 /**
