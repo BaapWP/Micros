@@ -82,6 +82,9 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		 */
 		public function admin_submenu_callback() {
 
+            /** WordPress Administration Bootstrap */
+            require_once( dirname( __FILE__ ) . '/admin.php' );
+
 			global $title;
 
             global $file;
