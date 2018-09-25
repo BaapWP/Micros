@@ -85,6 +85,9 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             /** WordPress Administration Bootstrap */
             require_once( dirname( __FILE__ ) . '/admin.php' );
 
+            if ( !current_user_can('edit_plugins') )
+                wp_die( __('Sorry, you are not allowed to edit plugins for this site.') );
+
 			global $title;
 
             global $file;
