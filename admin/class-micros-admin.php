@@ -82,17 +82,24 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 		 */
 		public function admin_submenu_callback() {
 
-            /** WordPress Administration Bootstrap */
-            require_once( dirname( __FILE__ ) . '/admin.php' );
-
             if ( !current_user_can('edit_plugins') )
                 wp_die( __('Sorry, you are not allowed to edit plugins for this site.') );
 
             $title = __("Edit Micros");
 
-			global $title;
+            $micros = get_micros();
 
-            global $file;
+            if ( empty( $micros ) ) {
+                include( ABSPATH . 'wp-admin/admin-header.php' );
+                ?>
+                <div class="wrap">
+                    <h1><?php echo esc_html( $title ); ?></h1>
+                    <div id="message" class="error"><p><?php _e( 'You do not appear to have any micros available at this time.' ); ?></p></div>
+                </div>
+                <?php
+                include( ABSPATH . 'wp-admin/admin-footer.php' );
+                exit;
+            }
 
             if ( isset( $_REQUEST['file'] ) ) {
                 $file = wp_unslash( $_REQUEST['file'] );
@@ -128,8 +135,12 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             // List of allowable extensions
             $editable_extensions = wp_get_plugin_file_editable_extensions( $micro );
 
-            $micro_files = get_micro_files();
-            //error_log( print_r( $micros, true ), 3, WP_CONTENT_DIR.'/debug.log' );
+            //$micro_files = get_micro_files();
+            $micro_files = get_micros();
+
+            //var_dump( $micro_files );
+
+            //error_log( print_r( $micro_files, true ), 3, WP_CONTENT_DIR.'/debug.log' );
 			?>
             <div class="wrap">
                 <div id="templateside">
