@@ -143,6 +143,31 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             //error_log( print_r( $micro_files, true ), 3, WP_CONTENT_DIR.'/debug.log' );
 			?>
             <div class="wrap">
+                <h1>Edit Micros</h1>
+                <div class="fileedit-sub">
+                    <div class="alignright">
+                        <form action="admin.php" method="get">
+                            <strong><label for="plugin"><?php _e('Select micro to edit:'); ?> </label></strong>
+                            <input type="hidden" name="page" value="editor">
+                            <select name="micro" id="micro">
+                                <?php
+                                foreach ( $micros as $micro_key => $a_micro ) {
+                                    $micro_name = $a_micro['title'];
+//                                    if ( $micro_key == $micro )
+//                                        $selected = " selected='selected'";
+//                                    else
+//                                        $selected = '';
+                                    $micro_name = esc_attr($micro_name);
+                                    $micro_key = esc_attr($micro_key);
+                                    echo "\n\t<option value=\"$micro_key\" $selected>$micro_name</option>";
+                                }
+                                ?>
+                            </select>
+                            <?php submit_button( __( 'Select' ), '', 'Submit', false ); ?>
+                        </form>
+                    </div>
+                    <br class="clear" />
+                </div>
                 <div id="templateside">
                     <h2 id="micro-files-label"><?php _e( 'Micro Files' ); ?></h2>
                     <?php
