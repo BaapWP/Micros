@@ -180,8 +180,8 @@ if( !function_exists('get_micros') ):
 
             if ( empty ( $decode_micro_data['name'] ) )
                 continue;
-
-            $wp_micros[ $micro_file ] = $decode_micro_data;
+            $micro_basename = str_replace( MICROS_UPLOAD_DIR.'/', '', $micro_file );
+            $wp_micros[ $micro_basename ] = $decode_micro_data;
         }
 
         $cache_micros[ $micros_folder ] = $wp_micros;
