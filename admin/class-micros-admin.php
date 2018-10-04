@@ -88,7 +88,6 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             $title = __("Edit Micros");
 
             $micros = get_micros();
-
             if ( empty( $micros ) ) {
                 include( ABSPATH . 'wp-admin/admin-header.php' );
                 ?>
@@ -101,26 +100,90 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                 exit;
             }
 
+            $file = '';
+            $micro = '';
+
             if ( isset( $_REQUEST['file'] ) ) {
                 $file = wp_unslash( $_REQUEST['file'] );
 
-            }else{
-                $micro_dir = WP_CONTENT_DIR.'/micro-micro';
-                $get_first_file_or_dir = scandir( $micro_dir );
-                if( is_dir( $micro_dir."/{$get_first_file_or_dir[2]}" ) ){
-                    $get_file = scandir( $micro_dir."/{$get_first_file_or_dir[2]}" );
-                    $file = $micro_dir."/{$get_first_file_or_dir[2]}"."/{$get_file[2]}";
+            }
 
-                }else{
-                    $file = $micro_dir."/{$get_first_file_or_dir[2]}";
+            if ( isset( $_REQUEST['micro'] ) ) {
+                $micro = wp_unslash( $_REQUEST['micro'] );
+            }
+
+            if ( empty( $micro ) ) {
+                if ( $file ) {
+
+                    // Locate the micro for a given micro file being edited.
+                    $file_dirname = dirname( $file );
+                    foreach ( array_keys( $micros ) as $micro_candidate ) {
+                        if ( $micro_candidate === $file || ( '.' !== $file_dirname && dirname( $micro_candidate ) === $file_dirname ) ) {
+                            $micro = $micro_candidate;
+                            break;
+                        }
+                    }
+
+                    // Fallback to the file as the micro.
+                    if ( empty( $micro ) ) {
+                        $micro = $file;
+                    }
+                } else {
+                    $micro = array_keys( $micros );
+                    $micro = $micro[0];
                 }
             }
-            //var_dump($file);
-            $file_content = esc_textarea( file_get_contents( $file ) );
+
+            $micro_files = get_micro_files($micro);
+
+            if ( empty( $file ) ) {
+                $file = $micro_files[0];
+            }
+
+            $file = validate_file_to_edit( $file, $micro_files );
+            $real_file = MICROS_UPLOAD_DIR. '/' . $file;
+
+            // Handle fallback editing of file when JavaScript is not available.
+            $edit_error = null;
+            $posted_content = null;
+            if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+                $r = wp_edit_theme_plugin_file( wp_unslash( $_POST ) );
+                if ( is_wp_error( $r ) ) {
+                    $edit_error = $r;
+                    if ( check_ajax_referer( 'edit-micro_' . $file, 'nonce', false ) && isset( $_POST['newcontent'] ) ) {
+                        $posted_content = wp_unslash( $_POST['newcontent'] );
+                    }
+                } else {
+                    wp_redirect( add_query_arg(
+                        array(
+                            'a' => 1, // This means "success" for some reason.
+                            'micro' => $micro,
+                            'file' => $file,
+                        ),
+                        admin_url( 'admin.php' )
+                    ) );
+                    exit;
+                }
+            }
+
+            // List of allowable extensions
+            $editable_extensions = wp_get_plugin_file_editable_extensions( $micro );
+
+            if ( ! is_file($real_file) ) {
+                wp_die(sprintf('<p>%s</p>', __('No such file exists! Double check the name and try again.')));
+            } else {
+                // Get the extension of the file
+                if ( preg_match('/\.([^.]+)$/', $real_file, $matches) ) {
+                    $ext = strtolower($matches[1]);
+                    // If extension is not in the acceptable list, skip it
+                    if ( !in_array( $ext, $editable_extensions) )
+                        wp_die(sprintf('<p>%s</p>', __('Files of this type are not editable.')));
+                }
+            }
 
 			// Adds codeEditor settings
 			$settings = array(
-				'codeEditor' => wp_enqueue_code_editor( array( 'type' => 'text/html' ) ),
+				'codeEditor' => wp_enqueue_code_editor( array( 'file' => $real_file ) ),
 			);
 
 			// Enqueues code editor script
@@ -132,11 +195,18 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 			// Adds inline script to set plugin name in  'wp.themePluginEditor.themeOrPlugin'
 			wp_add_inline_script( 'wp-theme-plugin-editor', 'wp.themePluginEditor.themeOrPlugin = "micros";' );
 
-            // List of allowable extensions
-            $editable_extensions = wp_get_plugin_file_editable_extensions( $micro );
+            require_once(ABSPATH . 'wp-admin/admin-header.php');
 
-            //$micro_files = get_micro_files();
-            $micro_files = get_micros();
+            if ( ! empty( $posted_content ) ) {
+                $content = $posted_content;
+            } else {
+                $content = file_get_contents( $real_file );
+            }
+
+            $content = esc_textarea( $content );
+
+            // List of allowable extensions
+            //$editable_extensions = wp_get_plugin_file_editable_extensions( $micro );
 
             //var_dump( $micro_files );
 
@@ -144,6 +214,18 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
 			?>
             <div class="wrap">
                 <h1>Edit Micros</h1>
+
+                <?php if ( isset( $_GET['a'] ) ) : ?>
+                    <div id="message" class="updated notice is-dismissible">
+                        <p><?php _e( 'File edited successfully.' ); ?></p>
+                    </div>
+                <?php elseif ( is_wp_error( $edit_error ) ) : ?>
+                    <div id="message" class="notice notice-error">
+                        <p><?php _e( 'There was an error while trying to update the file. You may need to fix something and try updating again.' ); ?></p>
+                        <pre><?php echo esc_html( $edit_error->get_error_message() ? $edit_error->get_error_message() : $edit_error->get_error_code() ); ?></pre>
+                    </div>
+                <?php endif; ?>
+
                 <div class="fileedit-sub">
                     <div class="alignright">
                         <form action="admin.php" method="get">
@@ -172,6 +254,7 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                     <h2 id="micro-files-label"><?php _e( 'Micro Files' ); ?></h2>
                     <?php
                     $micro_editable_files = array();
+                    //var_dump($micro_files);
                     foreach ( $micro_files as $micro_file ) {
                         if ( preg_match('/\.([^.]+)$/', $micro_file, $matches ) && in_array( $matches[1], $editable_extensions ) ) {
                             $micro_editable_files[] = $micro_file;
@@ -187,12 +270,12 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                 </div>
 
                 <form action="#" id="sub-template">
-                    <?php wp_nonce_field( 'edit-plugin_' . $file, 'nonce' ); ?>
+                    <?php wp_nonce_field( 'edit-micro_' . $file, 'nonce' ); ?>
                     <div>
                         <label for="newcontent" id="theme-plugin-editor-label"><?php _e( 'Selected file content:' ); ?></label>
-                        <textarea cols="70" rows="30" name="newcontent" id="newcontent"><?php echo $file_content; ?></textarea>
-                        <input type="hidden" name="file" value="<?php //echo esc_attr( $file ); ?>" />
-                        <input type="hidden" name="micros" value="<?php //echo esc_attr( $micros ); ?>" />
+                        <textarea cols="70" rows="30" name="newcontent" id="newcontent"><?php echo $content; ?></textarea>
+                        <input type="hidden" name="file" value="<?php echo esc_attr( $file ); ?>" />
+                        <input type="hidden" name="micros" value="<?php echo esc_attr( $micro ); ?>" />
                     </div>
                     <p class="submit">
                         <?php submit_button( __( 'Update File' ), 'primary', 'submit', false ); ?>
