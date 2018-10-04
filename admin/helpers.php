@@ -10,17 +10,29 @@
  * @param string $micro Path to the main micro file from micros-micros directory.
  * @return array List of files relative to the micros-micros root.
  */
-function get_micro_files( ) {
-	$dir = WP_CONTENT_DIR . '/micro-micro';
+function get_micro_files( $micro ) {
+    $micro_file = MICROS_UPLOAD_DIR . '/' . $micro;
+    $dir = dirname( $micro_file );
+    $micro_files = array( micro_basename( $micro_file ) );
 
-	if ( is_dir( $dir ) && WP_CONTENT_DIR !== $dir ) {
+    if ( is_dir( $dir ) && MICROS_UPLOAD_DIR !== $dir ) {
 
-        $list_files = list_files( $dir );
+        /**
+         * Filters the array of excluded directories and files while scanning the folder.
+         *
+         * @since 4.9.0
+         *
+         * @param array $exclusions Array of excluded directories and files.
+         */
+        $exclusions = (array) apply_filters( 'micro_files_exclusions', array( 'CVS', 'node_modules', 'vendor', 'bower_components' ) );
 
-		$micro_files = array_values( array_unique( $list_files ) );
-	}
-    //error_log( print_r( $micro_files, true ), 3, WP_CONTENT_DIR.'/debug.log' );
-	return $micro_files;
+        $list_files = list_files( $dir, 100, $exclusions );
+        $list_files = array_map( 'micro_basename', $list_files );
+
+        $micro_files = array_merge( $micro_files, $list_files );
+        $micro_files = array_values( array_unique( $micro_files ) );
+    }
+    return $micro_files;
 }
 
 /**
@@ -45,7 +57,7 @@ function wp_make_micro_file_tree( $micro_editable_files ) {
             $last_dir = $micro_file;
     }
         //error_log( print_r( $tree_list, true ), 3, WP_CONTENT_DIR.'/debug.log' );
-    return $tree_list['wp-content']['micro-micro'];
+    return $tree_list;
 }
 /**
  * Outputs the formatted file list for the micro editor.
@@ -61,8 +73,7 @@ function wp_make_micro_file_tree( $micro_editable_files ) {
  */
 function wp_print_micro_file_tree( $tree, $label = '', $level = 2, $size = 1, $index = 1 )
 {
-    //global $file, $micro;
-    global $file;
+    global $file, $micro;
     if (is_array($tree)) {
         $index = 0;
         $size = count($tree);
@@ -88,7 +99,7 @@ function wp_print_micro_file_tree( $tree, $label = '', $level = 2, $size = 1, $i
         $url = add_query_arg(
             array(
                 'file' => rawurlencode($tree),
-                //'micro' => rawurlencode($micro),
+                'micro' => rawurlencode($micro),
             ),
             self_admin_url('admin.php?page=editor')
         );
@@ -125,7 +136,7 @@ if( !function_exists('get_micros') ):
      * @since 1.5.0
      *
      * @param string $micro_folder Optional. Relative path to single micro folder.
-     * @return array Key is the plugin file path and the value is an array of the plugin data.
+     * @return array Key is the micro file path and the value is an array of the plugin data.
      */
     function get_micros($micros_folder = '') {
 
@@ -187,5 +198,28 @@ if( !function_exists('get_micros') ):
         $cache_micros[ $micros_folder ] = $wp_micros;
         wp_cache_set('micros', $cache_micros, 'micros');
         return $wp_micros;
+    }
+endif;
+
+if(!function_exists('micro_basename')):
+    function micro_basename( $file ) {
+        //global $wp_plugin_paths;
+
+        // $wp_plugin_paths contains normalized paths.
+        $file = wp_normalize_path( $file );
+
+        //arsort( $wp_plugin_paths );
+//        foreach ( $wp_plugin_paths as $dir => $realdir ) {
+//            if ( strpos( $file, $realdir ) === 0 ) {
+//                $file = $dir . substr( $file, strlen( $realdir ) );
+//            }
+//        }
+
+        $micro_dir = wp_normalize_path( MICROS_UPLOAD_DIR );
+        //$mu_micro_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
+
+        $file = preg_replace('#^' . preg_quote($micro_dir, '#') . '/|^' . preg_quote($mu_micro_dir, '#') . '/#','',$file); // get relative path from micros dir
+        $file = trim($file, '/');
+        return $file;
     }
 endif;
