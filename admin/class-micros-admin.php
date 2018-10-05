@@ -7,11 +7,6 @@
  * @since 0.0.1
  */
 
-/**
- * Require helper functions
- */
-require_once( MICROS_PLUGIN_DIR.'/admin/helpers.php' );
-
 //Exits if 'ABSPATH' constant not defined
 defined( 'ABSPATH' ) || exit();
 
@@ -26,6 +21,12 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
      * @subpackage micros/admin
      * @author Saurabh Skukla
 	 */
+
+    /**
+     * Require helper functions
+     */
+    require_once( MICROS_PLUGIN_DIR.'/admin/helpers.php' );
+
 	class Micros_Admin {
 
         /**
@@ -139,7 +140,6 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
             if ( empty( $file ) ) {
                 $file = $micro_files[0];
             }
-
             $file = validate_file_to_edit( $file, $micro_files );
             $real_file = MICROS_UPLOAD_DIR. '/' . $file;
 
