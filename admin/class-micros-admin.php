@@ -101,8 +101,8 @@ if ( ! class_exists( 'Micros_Admin' ) ) {
                 exit;
             }
 
-            $file = '';
-            $micro = '';
+            global $file;
+            global $micro;
 
             if ( isset( $_REQUEST['file'] ) ) {
                 $file = wp_unslash( $_REQUEST['file'] );
